@@ -8,7 +8,6 @@
 //
 
 #include "HcalClosureTest/Analyzers/interface/CalcRespCorr.h"
-#include "HcalClosureTest/DataFormat/interface/SingleParticleCluster.h"
 #include "FWCore/Utilities/interface/EDMException.h"
 
 #include "TFile.h"
@@ -35,7 +34,7 @@ CalcRespCorr::CalcRespCorr(const edm::ParameterSet& iConfig)
     throw edm::Exception(edm::errors::ProductNotFound)
       << " respCorr has " << respCorr_.size() << " elements.  We want 83.";
   }
-
+  tok_SPC_ = consumes<SingleParticleClusterCollection>(edm::InputTag(clstrCollName_));
 }
   
   
@@ -53,7 +52,7 @@ void
 CalcRespCorr::analyze(const edm::Event& iEvent, const edm::EventSetup&)
 { 
   edm::Handle<SingleParticleClusterCollection> handle;
-  iEvent.getByLabel(clstrCollName_,handle);
+  iEvent.getByToken(tok_SPC_,handle);
   if(!handle.isValid()) {
     throw edm::Exception(edm::errors::ProductNotFound)
       << " could not find SingleParticleClusterCollection named " << clstrCollName_ << ".\n";

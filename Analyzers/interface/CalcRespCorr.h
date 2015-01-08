@@ -20,9 +20,9 @@
 
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include "HcalClosureTest/DataFormat/interface/SingleParticleCluster.h"
 
 // forward declarations
 class TH1D;
@@ -45,6 +45,7 @@ class CalcRespCorr : public edm::EDAnalyzer {
   virtual void endJob();
 
   // parameters
+  edm::EDGetTokenT<SingleParticleClusterCollection>   tok_SPC_;
   std::string clstrCollName_;    // label for the particle cluster collection
   std::string rootHistFilename_; // name of the histogram file
   double maxDeltaR_;             // maximum deltaR between particle and cluster

@@ -1,13 +1,7 @@
 //
 #include "HcalClosureTest/Analyzers/interface/CalcRespCorrPhotonPlusJet.h"
-#include "DataFormats/JetReco/interface/CaloJetCollection.h"
-#include "DataFormats/JetReco/interface/PFJetCollection.h"
-#include "DataFormats/JetReco/interface/GenJetCollection.h"
-#include "DataFormats/TrackReco/interface/Track.h"
-#include "DataFormats/TrackReco/interface/TrackExtra.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "FWCore/Utilities/interface/EDMException.h"
-#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "RecoEgamma/EgammaElectronAlgos/interface/ElectronHcalHelper.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionTools.h"
 #include "RecoEgamma/EgammaTools/interface/ConversionFinder.h"
@@ -17,9 +11,6 @@
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 #include "FWCore/Common/interface/TriggerNames.h"
-#include "DataFormats/METReco/interface/METCollection.h"
-#include "DataFormats/METReco/interface/PFMET.h"
-#include "DataFormats/METReco/interface/PFMETCollection.h"
 
 #include "TTree.h"
 #include "TFile.h"
@@ -31,7 +22,6 @@
 #include <vector>
 #include <set>
 #include <map>
-using namespace std;
 
 #include <boost/regex.hpp>
 
@@ -105,7 +95,7 @@ void printElementsInBlocks(const reco::PFCandidate& cand,
     HERE("iBlock=",i);
     reco::PFBlockRef blockRef = cand.elementsInBlocks()[i].first;
     if(blockRef.isNull()) {
-      cerr<<"ERROR! no block ref!";
+      std::cerr<<"ERROR! no block ref!"<<std::endl;
       continue;
     }
     if (0) {
@@ -115,9 +105,9 @@ void printElementsInBlocks(const reco::PFCandidate& cand,
 	firstRef = blockRef;
       }
       else if( blockRef!=firstRef) {
-	cerr<<"WARNING! This PFCandidate is not made from a single block"<<endl;
+	std::cerr<<"WARNING! This PFCandidate is not made from a single block"<<std::endl;
       }
-      out<<"\t"<<cand.elementsInBlocks()[i].second<<endl;
+      out<<"\t"<<cand.elementsInBlocks()[i].second<<std::endl;
     }
     else {
       const edm::OwnVector<reco::PFBlockElement>& elements = blockRef->elements();
@@ -175,6 +165,29 @@ CalcRespCorrPhotonPlusJet::CalcRespCorrPhotonPlusJet(const edm::ParameterSet& iC
   // set it here to ensure the value is defined
   eventWeight_ = 1.0;
   nProcessed_ = 0;
+
+  //Get the tokens
+  tok_Photon_      = consumes<reco::PhotonCollection>(photonCollName_);
+  tok_CaloJet_     = consumes<reco::CaloJetCollection>(caloJetCollName_);
+  tok_PFJet_       = consumes<reco::PFJetCollection>(pfJetCollName_);
+  tok_GenJet_      = consumes<std::vector<reco::GenJet> >(genJetCollName_);
+  tok_GenPart_     = consumes<std::vector<reco::GenParticle> >(genParticleCollName_); 
+  tok_GenEvInfo_   = consumes<GenEventInfoProduct>(genEventInfoName_);
+  tok_HBHE_        = consumes<edm::SortedCollection<HBHERecHit,edm::StrictWeakOrdering<HBHERecHit> > >(hbheRecHitName_);
+  tok_HF_          = consumes<edm::SortedCollection<HFRecHit,edm::StrictWeakOrdering<HFRecHit> > >(hfRecHitName_);
+  tok_HO_          = consumes<edm::SortedCollection<HORecHit,edm::StrictWeakOrdering<HORecHit> > >(hoRecHitName_);
+  tok_loosePhoton_ = consumes<edm::ValueMap<Bool_t> >(edm::InputTag("PhotonIDProd", "PhotonCutBasedIDLoose"));
+  tok_tightPhoton_ = consumes<edm::ValueMap<Bool_t> >(edm::InputTag("PhotonIDProd", "PhotonCutBasedIDTight"));
+  tok_PFCand_      = consumes<reco::PFCandidateCollection>(edm::InputTag("particleFlow"));
+  tok_Vertex_      = consumes<reco::VertexCollection>(edm::InputTag("offlinePrimaryVertices"));
+  tok_GsfElec_     = consumes<reco::GsfElectronCollection>(edm::InputTag("gsfElectrons"));
+  tok_Rho_         = consumes<double>(rhoCollection_);
+  tok_Conv_        = consumes<reco::ConversionCollection>(edm::InputTag("allConversions"));
+  tok_BS_          = consumes<reco::BeamSpot>(edm::InputTag("offlineBeamSpot"));
+  tok_PV_          = consumes<std::vector<reco::Vertex> >(pvCollName_);
+  tok_PFMET_       = consumes<reco::PFMETCollection>(pfMETColl);
+  tok_PFType1MET_  = consumes<reco::PFMETCollection>(pfType1METColl);
+  tok_TrigRes_     = consumes<edm::TriggerResults>(edm::InputTag("TriggerResults","","HLT"));
 }
 
 CalcRespCorrPhotonPlusJet::~CalcRespCorrPhotonPlusJet()
@@ -198,7 +211,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
 
   // 1st. Get Photons //
   edm::Handle<reco::PhotonCollection> photons;
-  iEvent.getByLabel(photonCollName_, photons);
+  iEvent.getByToken(tok_Photon_, photons);
   if(!photons.isValid()) {
     throw edm::Exception(edm::errors::ProductNotFound)
       << " could not find PhotonCollection named " << photonCollName_ << ".\n";
@@ -217,8 +230,8 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
 
   // Get photon quality flags
   edm::Handle<edm::ValueMap<Bool_t> > loosePhotonQual, tightPhotonQual;
-  iEvent.getByLabel("PhotonIDProd", "PhotonCutBasedIDLoose", loosePhotonQual);
-  iEvent.getByLabel("PhotonIDProd", "PhotonCutBasedIDTight", tightPhotonQual);
+  iEvent.getByToken(tok_loosePhoton_, loosePhotonQual);
+  iEvent.getByToken(tok_tightPhoton_, tightPhotonQual);
   if (!loosePhotonQual.isValid() || !tightPhotonQual.isValid()) {
     std::cout << "failed to get photon quality flags" << std::endl;
     throw edm::Exception(edm::errors::ProductNotFound) << " PhotonID flags\n";
@@ -279,7 +292,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
 
   unsigned int anyJetCount=0;
   if (doCaloJets_) {
-    iEvent.getByLabel(caloJetCollName_,calojets);
+    iEvent.getByToken(tok_CaloJet_,calojets);
     if(!calojets.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find CaloJetCollection named " << caloJetCollName_ << ".\n";
@@ -290,7 +303,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
   }
 
   if (doPFJets_) {
-    iEvent.getByLabel(pfJetCollName_,pfjets);
+    iEvent.getByToken(tok_PFJet_,pfjets);
     if(!pfjets.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find PFJetCollection named " << pfJetCollName_ << ".\n";
@@ -327,7 +340,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
   if (!photonTrigFlag || !jetTrigFlag) {
     // check the triggers
     edm::Handle<edm::TriggerResults> triggerResults;
-    if( !iEvent.getByLabel(edm::InputTag("TriggerResults::HLT"),triggerResults) ) {
+    if( !iEvent.getByToken(tok_TrigRes_,triggerResults) ) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find TriggerResults::HLT\n";
       return;
@@ -406,33 +419,32 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
 
   edm::Handle<std::vector<reco::GenJet>> genjets;
   edm::Handle<std::vector<reco::GenParticle> > genparticles;
-
   edm::Handle<reco::PFCandidateCollection> pfHandle;
-  iEvent.getByLabel("particleFlow", pfHandle);
+  iEvent.getByToken(tok_PFCand_, pfHandle);
 
   edm::Handle<reco::VertexCollection> vtxHandle;
-  iEvent.getByLabel("offlinePrimaryVertices", vtxHandle);
+  iEvent.getByToken(tok_Vertex_, vtxHandle);
 
   //edm::Handle<reco::GsfElectronCollection> gsfElectronHandle;
-  //iEvent.getByLabel("gsfElectrons", gsfElectronHandle);
+  //iEvent.getByToken(tok_GsfElec_, gsfElectronHandle);
 
   //edm::Handle<double> rhoHandle_2012;
-  //iEvent.getByLabel(rhoCollection_, rhoHandle_2012);
+  //iEvent.getByToken(tok_Rho_, rhoHandle_2012);
   //rho2012_ = *(rhoHandle_2012.product());
   rho2012_ = -1e6;
 
   ///  std::cout << "getting convH" << std::endl;
   edm::Handle<reco::ConversionCollection> convH;
-  iEvent.getByLabel("allConversions", convH);
+  iEvent.getByToken(tok_Conv_, convH);
 
   /////  std::cout << "getting beamSpotHandle" << std::endl;
   edm::Handle<reco::BeamSpot> beamSpotHandle;
-  iEvent.getByLabel("offlineBeamSpot", beamSpotHandle);
+  iEvent.getByToken(tok_BS_, beamSpotHandle);
 
 
   if(doGenJets_){
     // Get GenJets
-    iEvent.getByLabel(genJetCollName_,genjets);
+    iEvent.getByToken(tok_GenJet_,genjets);
     if(!genjets.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find GenJet vector named " << genJetCollName_ << ".\n";
@@ -441,7 +453,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
     nGenJets_= genjets->size();
 
     // Get GenParticles
-    iEvent.getByLabel(genParticleCollName_,genparticles);
+    iEvent.getByToken(tok_GenPart_,genparticles);
     if(!genparticles.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find GenParticle vector named " << genParticleCollName_ << ".\n";
@@ -450,7 +462,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
 
     // Get weights
     edm::Handle<GenEventInfoProduct> genEventInfoProduct;
-    iEvent.getByLabel(genEventInfoName_, genEventInfoProduct);
+    iEvent.getByToken(tok_GenEvInfo_, genEventInfoProduct);
     if(!genEventInfoProduct.isValid()){
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find GenEventInfoProduct named " << genEventInfoName_ << " \n";
@@ -736,7 +748,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
 
     // Get RecHits in HB and HE
     edm::Handle<edm::SortedCollection<HBHERecHit,edm::StrictWeakOrdering<HBHERecHit>>> hbhereco;
-    iEvent.getByLabel(hbheRecHitName_,hbhereco);
+    iEvent.getByToken(tok_HBHE_,hbhereco);
     if(!hbhereco.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find HBHERecHit named " << hbheRecHitName_ << ".\n";
@@ -745,7 +757,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
     
     // Get RecHits in HF
     edm::Handle<edm::SortedCollection<HFRecHit,edm::StrictWeakOrdering<HFRecHit>>> hfreco;
-    iEvent.getByLabel(hfRecHitName_,hfreco);
+    iEvent.getByToken(tok_HF_,hfreco);
     if(!hfreco.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find HFRecHit named " << hfRecHitName_ << ".\n";
@@ -754,7 +766,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
 
     // Get RecHits in HO
     edm::Handle<edm::SortedCollection<HORecHit,edm::StrictWeakOrdering<HORecHit>>> horeco;
-    iEvent.getByLabel(hoRecHitName_,horeco);
+    iEvent.getByToken(tok_HO_,horeco);
     if(!horeco.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find HORecHit named " << hoRecHitName_ << ".\n";
@@ -798,7 +810,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
 
     // Get primary vertices
     edm::Handle<std::vector<reco::Vertex>> pv;
-    iEvent.getByLabel(pvCollName_,pv);
+    iEvent.getByToken(tok_PV_,pv);
     if(!pv.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find Vertex named " << pvCollName_ << ".\n";
@@ -1469,7 +1481,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
 
     ///// MET /////
     edm::Handle<reco::PFMETCollection> pfmet_h;
-    iEvent.getByLabel(pfMETColl, pfmet_h);
+    iEvent.getByToken(tok_PFMET_, pfmet_h);
     if (!pfmet_h.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find " << pfMETColl << ".\n";
@@ -1480,7 +1492,7 @@ void CalcRespCorrPhotonPlusJet::analyze(const edm::Event& iEvent, const edm::Eve
     met_sumEt_ = pfmet_h->begin()->sumEt();
 
     edm::Handle<reco::PFMETCollection> pfmetType1_h;
-    iEvent.getByLabel(pfType1METColl, pfmetType1_h);
+    iEvent.getByToken(tok_PFType1MET_, pfmetType1_h);
     if ( pfmetType1_h.isValid()) {
       metType1_value_ = pfmetType1_h->begin()->et();
       metType1_phi_   = pfmetType1_h->begin()->phi();

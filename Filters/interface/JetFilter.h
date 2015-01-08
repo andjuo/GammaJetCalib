@@ -26,6 +26,7 @@
 
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include "DataFormats/JetReco/interface/CaloJetCollection.h"
 
 //
 // class declaration
@@ -59,7 +60,8 @@ private:
   double maxRestJetEt_;
 
   std::string caloJetCollName_;
-};
+  edm::EDGetTokenT<reco::CaloJetCollection>         tok_CaloJet_;
+ };
 
 //
 // constants, enums and typedefs

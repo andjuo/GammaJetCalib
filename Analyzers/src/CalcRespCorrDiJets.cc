@@ -12,7 +12,6 @@
 #include "HcalClosureTest/Analyzers/interface/CalcRespCorrDiJets.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
-#include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 #include "FWCore/Utilities/interface/EDMException.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
@@ -31,15 +30,16 @@ CalcRespCorrDiJets::CalcRespCorrDiJets(const edm::ParameterSet& iConfig)
 {
   // set parameters
   caloJetCollName_     = iConfig.getParameter<std::string>("caloJetCollName");
-  caloJetCorrName_     = iConfig.getParameter<std::string>("caloJetCorrName");
   pfJetCollName_       = iConfig.getParameter<std::string>("pfJetCollName");
-  pfJetCorrName_       = iConfig.getParameter<std::string>("pfJetCorrName");
   genJetCollName_      = iConfig.getParameter<std::string>("genJetCollName");
   genParticleCollName_ = iConfig.getParameter<std::string>("genParticleCollName");
   genEventInfoName_    = iConfig.getParameter<std::string>("genEventInfoName");
   hbheRecHitName_      = iConfig.getParameter<std::string>("hbheRecHitName");
   hfRecHitName_        = iConfig.getParameter<std::string>("hfRecHitName");
   hoRecHitName_        = iConfig.getParameter<std::string>("hoRecHitName");
+
+  caloJetCorrName_     = iConfig.getParameter<std::string>("caloJetCorrName");
+  pfJetCorrName_       = iConfig.getParameter<std::string>("pfJetCorrName");
   rootHistFilename_    = iConfig.getParameter<std::string>("rootHistFilename");
   maxDeltaEta_         = iConfig.getParameter<double>("maxDeltaEta");
   minTagJetEta_        = iConfig.getParameter<double>("minTagJetEta");
@@ -52,6 +52,15 @@ CalcRespCorrDiJets::CalcRespCorrDiJets(const edm::ParameterSet& iConfig)
   doPFJets_            = iConfig.getParameter<bool>("doPFJets");
   doGenJets_           = iConfig.getParameter<bool>("doGenJets");
   debug_               = iConfig.getUntrackedParameter<bool>("debug", false);
+
+  tok_CaloJet_   = consumes<reco::CaloJetCollection>        (caloJetCollName_);
+  tok_PFJet_     = consumes<reco::PFJetCollection>          (pfJetCollName_);
+  tok_GenJet_    = consumes<std::vector<reco::GenJet> >     (genJetCollName_);
+  tok_GenPart_   = consumes<std::vector<reco::GenParticle> >(genParticleCollName_); 
+  tok_GenEvInfo_ = consumes<GenEventInfoProduct>            (genEventInfoName_);
+  tok_HBHE_      = consumes<edm::SortedCollection<HBHERecHit,edm::StrictWeakOrdering<HBHERecHit> > > (hbheRecHitName_);
+  tok_HF_        = consumes<edm::SortedCollection<HFRecHit,edm::StrictWeakOrdering<HFRecHit> > >   (hfRecHitName_);
+  tok_HO_        = consumes<edm::SortedCollection<HORecHit,edm::StrictWeakOrdering<HORecHit> > >   (hoRecHitName_);
 }
 
 CalcRespCorrDiJets::~CalcRespCorrDiJets()
@@ -70,7 +79,7 @@ CalcRespCorrDiJets::analyze(const edm::Event& iEvent, const edm::EventSetup& evS
   edm::Handle<std::vector<reco::GenParticle> > genparticles;
   if(doGenJets_){
     // Get GenJets
-    iEvent.getByLabel(genJetCollName_,genjets);
+    iEvent.getByToken(tok_GenJet_,genjets);
     if(!genjets.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find GenJet vector named " << genJetCollName_ << ".\n";
@@ -78,7 +87,7 @@ CalcRespCorrDiJets::analyze(const edm::Event& iEvent, const edm::EventSetup& evS
     }
 
     // Get GenParticles
-    iEvent.getByLabel(genParticleCollName_,genparticles);
+    iEvent.getByToken(tok_GenPart_,genparticles);
     if(!genparticles.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find GenParticle vector named " << genParticleCollName_ << ".\n";
@@ -87,7 +96,7 @@ CalcRespCorrDiJets::analyze(const edm::Event& iEvent, const edm::EventSetup& evS
 
     // Get weights
     edm::Handle<GenEventInfoProduct> genEventInfoProduct;
-    iEvent.getByLabel(genEventInfoName_, genEventInfoProduct);
+    iEvent.getByToken(tok_GenEvInfo_, genEventInfoProduct);
     if(!genEventInfoProduct.isValid()){
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find GenEventInfoProduct named " << genEventInfoName_ << " \n";
@@ -102,7 +111,7 @@ CalcRespCorrDiJets::analyze(const edm::Event& iEvent, const edm::EventSetup& evS
     
     // Get CaloJets
     edm::Handle<reco::CaloJetCollection> calojets;
-    iEvent.getByLabel(caloJetCollName_,calojets);
+    iEvent.getByToken(tok_CaloJet_,calojets);
     if(!calojets.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find CaloJetCollection named " << caloJetCollName_ << ".\n";
@@ -283,7 +292,7 @@ CalcRespCorrDiJets::analyze(const edm::Event& iEvent, const edm::EventSetup& evS
     
     // Get PFJets
     edm::Handle<reco::PFJetCollection> pfjets;
-    iEvent.getByLabel(pfJetCollName_,pfjets);
+    iEvent.getByToken(tok_PFJet_,pfjets);
     if(!pfjets.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find PFJetCollection named " << pfJetCollName_ << ".\n";
@@ -292,7 +301,7 @@ CalcRespCorrDiJets::analyze(const edm::Event& iEvent, const edm::EventSetup& evS
 
     // Get RecHits in HB and HE
     edm::Handle<edm::SortedCollection<HBHERecHit,edm::StrictWeakOrdering<HBHERecHit>>> hbhereco;
-    iEvent.getByLabel(hbheRecHitName_,hbhereco);
+    iEvent.getByToken(tok_HBHE_,hbhereco);
     if(!hbhereco.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find HBHERecHit named " << hbheRecHitName_ << ".\n";
@@ -301,7 +310,7 @@ CalcRespCorrDiJets::analyze(const edm::Event& iEvent, const edm::EventSetup& evS
     
     // Get RecHits in HF
     edm::Handle<edm::SortedCollection<HFRecHit,edm::StrictWeakOrdering<HFRecHit>>> hfreco;
-    iEvent.getByLabel(hfRecHitName_,hfreco);
+    iEvent.getByToken(tok_HF_,hfreco);
     if(!hfreco.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find HFRecHit named " << hfRecHitName_ << ".\n";
@@ -310,7 +319,7 @@ CalcRespCorrDiJets::analyze(const edm::Event& iEvent, const edm::EventSetup& evS
 
     // Get RecHits in HO
     edm::Handle<edm::SortedCollection<HORecHit,edm::StrictWeakOrdering<HORecHit>>> horeco;
-    iEvent.getByLabel(hoRecHitName_,horeco);
+    iEvent.getByToken(tok_HO_,horeco);
     if(!horeco.isValid()) {
       throw edm::Exception(edm::errors::ProductNotFound)
 	<< " could not find HORecHit named " << hoRecHitName_ << ".\n";

@@ -1,5 +1,4 @@
 #include "HcalClosureTest/Filters/interface/JetFilter.h"
-#include "DataFormats/JetReco/interface/CaloJetCollection.h"
 
 //
 // constructors and destructor
@@ -22,6 +21,7 @@ JetFilter::JetFilter(const edm::ParameterSet& iConfig)
   maxRestJetEt_ = iConfig.getUntrackedParameter<double>("maxRestJetEt");
 
   caloJetCollName_ = iConfig.getUntrackedParameter<std::string>("caloJetCollName");
+  tok_CaloJet_     = consumes<reco::CaloJetCollection>(caloJetCollName_);
 }
 
 
@@ -44,7 +44,7 @@ JetFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   // get the jet collection
   edm::Handle<reco::CaloJetCollection> handle;
-  iEvent.getByLabel(caloJetCollName_, handle);
+  iEvent.getByToken(tok_CaloJet_, handle);
   if(!handle.isValid()) {
     throw edm::Exception(edm::errors::ProductNotFound)
       << " could not find jetCollection named " << caloJetCollName_ << "\n.";

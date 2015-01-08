@@ -6,6 +6,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/CaloTowers/interface/CaloTowerCollection.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include <vector>
 
@@ -15,12 +16,12 @@
 
 class SingleParticleClusterProducer : public edm::EDProducer
 {
- public:
+public:
   explicit SingleParticleClusterProducer(const edm::ParameterSet&);
   ~SingleParticleClusterProducer();
   
   
- private:
+private:
 
   math::XYZTLorentzVector getP4From3x3Towers(const std::vector<CaloTowerCollection::const_iterator>& twrs) const;
   void get3x3TowersFromSeed(const edm::Handle<CaloTowerCollection>& twrcoll, const math::XYZTLorentzVector &p4, std::vector<CaloTowerCollection::const_iterator>& towervector) const;
@@ -30,8 +31,9 @@ class SingleParticleClusterProducer : public edm::EDProducer
   virtual void endJob() ;
 
   // ----------member data ---------------------------
-
-  
+  edm::EDGetTokenT<std::vector<reco::GenParticle> > tok_GenPart_;
+  edm::EDGetTokenT<CaloTowerCollection>             tok_CaloTower_; 
+   
 };
 
 //

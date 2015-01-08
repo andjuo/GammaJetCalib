@@ -7,9 +7,6 @@
 int CPlot::sCount = 0;
 TString CPlot::sOutDir = "./plots";
 
-using std::cout;
-using std::endl;
-
 // -------------------------------------------------
 
 CPlot::CPlot():
@@ -547,7 +544,7 @@ void CPlot::Draw(TCanvas *c, bool doSave, TString format, int subpad)
       for(UInt_t j=0; j<fTextBoxes.size(); j++)
         fTextBoxes[j]->Draw();
             
-      cout << "DEBUG: saving" << endl;
+      std::cout << "DEBUG: saving" << std::endl;
       if(doSave) {
         gSystem->mkdir(sOutDir,true);
         TString outname = sOutDir+TString("/")+fName+TString(".");
@@ -857,8 +854,8 @@ void CPlot::Draw(TCanvas *c, bool doSave, TString format, int subpad)
   if(doSave) {
     gSystem->mkdir(sOutDir,true);
     TString outname = sOutDir+TString("/")+fName+TString(".");
-    cout << "Check sOutDir in Draw: " << sOutDir << endl;
-    cout << "Saving to " << outname << endl;
+    std::cout << "Check sOutDir in Draw: " << sOutDir << std::endl;
+    std::cout << "Saving to " << outname << std::endl;
     if(format.CompareTo("all",TString::kIgnoreCase)==0) {
       c->SaveAs(outname+TString("png"));
       c->SaveAs(outname+TString("eps"));

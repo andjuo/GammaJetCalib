@@ -69,19 +69,17 @@ void SaveCanvas(TCanvas* canv, const TString &canvName, TString destDir)
 
 Double_t calc_effSigma(TH1 * hist)
 {
-  using std::cout;
-  using std::endl;
 
   TAxis *xaxis = hist->GetXaxis();
   Int_t nb = xaxis->GetNbins();
   if(nb < 10) {
-    cout << "effsigma: Not a valid histo. nbins = " << nb << endl;
+    std::cout << "effsigma: Not a valid histo. nbins = " << nb << std::endl;
     return 0.;
   }
 
   Double_t bwid = hist->GetBinWidth(1);
   if(bwid == 0) {
-    cout << "effsigma: Not a valid histo. bwid = " << bwid << endl;
+    std::cout << "effsigma: Not a valid histo. bwid = " << bwid << std::endl;
     return 0.;
   }
   //Double_t xmax = xaxis->GetXmax(); // not used
@@ -94,7 +92,7 @@ Double_t calc_effSigma(TH1 * hist)
     total+=hist->GetBinContent(i);
   }
   if(total < 10.) {
-    cout << "effsigma: Too few entries " << total << endl;
+    std::cout << "effsigma: Too few entries " << total << std::endl;
     return 0.;
   }
   Int_t ierr=0;
@@ -147,11 +145,11 @@ Double_t calc_effSigma(TH1 * hist)
     }
   }
   if(ismin == nrms || ismin == -nrms) {
-    cout << endl << endl << "CRAP!!!" << endl;
-    cout << ismin << '\t' << nrms << endl;
+    std::cout << std::endl << std::endl << "CRAP!!!" << std::endl;
+    std::cout << ismin << '\t' << nrms << std::endl;
     ierr=3;
   }
-  if(ierr != 0 && ierr != 1) cout << "effsigma: Error of type " << ierr <<endl;
+  if(ierr != 0 && ierr != 1) std::cout << "effsigma: Error of type " << ierr <<std::endl;
 
   return widmin;
 

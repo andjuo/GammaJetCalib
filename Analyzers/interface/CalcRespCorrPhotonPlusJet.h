@@ -21,17 +21,28 @@
 #include "DataFormats/EgammaCandidates/interface/PhotonFwd.h"
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
 #include "DataFormats/JetReco/interface/CaloJetCollection.h"
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "DataFormats/JetReco/interface/PFJetCollection.h"
 #include "DataFormats/HcalRecHit/interface/HBHERecHit.h"
 #include "DataFormats/HcalRecHit/interface/HFRecHit.h"
 #include "DataFormats/HcalRecHit/interface/HORecHit.h"
+#include "DataFormats/METReco/interface/METCollection.h"
+#include "DataFormats/METReco/interface/PFMET.h"
+#include "DataFormats/METReco/interface/PFMETCollection.h"
 #include "DataFormats/ParticleFlowReco/interface/PFBlockFwd.h"
 #include "DataFormats/ParticleFlowReco/interface/PFBlock.h"
+#include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/ParticleFlowReco/interface/PFCluster.h"
 #include "DataFormats/ParticleFlowReco/interface/PFRecHit.h"
 #include "DataFormats/ParticleFlowReco/interface/PFRecHitFwd.h"
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackExtra.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/HLTReco/interface/TriggerEvent.h"
+#include "DataFormats/HLTReco/interface/TriggerObject.h"
+
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
@@ -55,7 +66,8 @@ class TTree;
 //
 
 class PhotonPair : protected std::pair<const reco::Photon*, double> {
- public:
+
+public:
   PhotonPair() {
     first=0;
     second=0.0;
@@ -76,13 +88,13 @@ class PhotonPair : protected std::pair<const reco::Photon*, double> {
   int idx() const { return fIdx; }
   bool isValid() const { return (first!=NULL) ? true:false; }
 
- private:
+private:
   int fIdx; // index in the photon collection
 };
 
 
 class CaloJetCorretPair : protected std::pair<const reco::CaloJet*, double> {
- public:
+public:
   CaloJetCorretPair() {
     first=0;
     second=1.0;
@@ -100,12 +112,12 @@ class CaloJetCorretPair : protected std::pair<const reco::CaloJet*, double> {
   double scaledEt() const { return first->et() * second; }
   bool isValid() const { return (first!=NULL) ? true:false; }
 
- private:
+private:
   
 };
 
 class PFJetCorretPair : protected std::pair<const reco::PFJet*, double> {
- public:
+public:
   PFJetCorretPair() {
     first=0;
     second=1.0;
@@ -123,7 +135,7 @@ class PFJetCorretPair : protected std::pair<const reco::PFJet*, double> {
   double scaledEt() const { return first->et() * second; }
   bool isValid() const { return (first!=NULL) ? true:false; }
 
- private:
+private:
   
 };
 
@@ -132,7 +144,7 @@ class PFJetCorretPair : protected std::pair<const reco::PFJet*, double> {
 // --------------------------------------------
 
 class CalcRespCorrPhotonPlusJet : public edm::EDAnalyzer {
- public:
+public:
   explicit CalcRespCorrPhotonPlusJet(const edm::ParameterSet&);
   ~CalcRespCorrPhotonPlusJet();
 
@@ -145,7 +157,7 @@ class CalcRespCorrPhotonPlusJet : public edm::EDAnalyzer {
   //std::vector<float> pfTkIsoWithVertex(const reco::Photon*, edm::Handle<reco::PFCandidateCollection>, edm::Handle<reco::VertexCollection>, float, float, float, float, float, float, reco::PFCandidate::ParticleType);
   std::vector<float> pfTkIsoWithVertex(const reco::Photon* localPho1, edm::Handle<reco::PFCandidateCollection> pfHandle, edm::Handle<reco::VertexCollection> vtxHandle, float dRmax, float dRvetoBarrel, float dRvetoEndcap, float ptMin, float dzMax, float dxyMax, reco::PFCandidate::ParticleType pfToUse);
 
- private:
+private:
   virtual void beginJob();//(const edm::EventSetup&);
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob();
@@ -169,7 +181,7 @@ class CalcRespCorrPhotonPlusJet : public edm::EDAnalyzer {
   std::string hfRecHitName_;        // label for HFRecHit collection
   std::string hoRecHitName_;        // label for HORecHit collection
   std::string rootHistFilename_;    // name of the histogram file
-  std::string pvCollName_; // label for primary vertex collection
+  std::string pvCollName_;          // label for primary vertex collection
 
   bool allowNoPhoton_; // whether module is used for dijet analysis
   double photonPtMin_;   // lowest value of the leading photon pT
@@ -180,6 +192,29 @@ class CalcRespCorrPhotonPlusJet : public edm::EDAnalyzer {
   std::vector<std::string> photonTrigNamesV_; // photon trigger names
   std::vector<std::string> jetTrigNamesV_; // jet trigger names
   bool writeTriggerPrescale_; // whether attempt to record the prescale
+
+  //Tokens
+  edm::EDGetTokenT<reco::PhotonCollection>          tok_Photon_;
+  edm::EDGetTokenT<reco::CaloJetCollection>         tok_CaloJet_;
+  edm::EDGetTokenT<reco::PFJetCollection>           tok_PFJet_;
+  edm::EDGetTokenT<std::vector<reco::GenJet> >      tok_GenJet_;
+  edm::EDGetTokenT<std::vector<reco::GenParticle> > tok_GenPart_;
+  edm::EDGetTokenT<GenEventInfoProduct>             tok_GenEvInfo_; 
+  edm::EDGetTokenT<edm::SortedCollection<HBHERecHit,edm::StrictWeakOrdering<HBHERecHit> > > tok_HBHE_;
+  edm::EDGetTokenT<edm::SortedCollection<HFRecHit,edm::StrictWeakOrdering<HFRecHit> > >     tok_HF_;
+  edm::EDGetTokenT<edm::SortedCollection<HORecHit,edm::StrictWeakOrdering<HORecHit> > >     tok_HO_;
+  edm::EDGetTokenT<edm::ValueMap<Bool_t> >          tok_loosePhoton_;
+  edm::EDGetTokenT<edm::ValueMap<Bool_t> >          tok_tightPhoton_;
+  edm::EDGetTokenT<reco::PFCandidateCollection>     tok_PFCand_;
+  edm::EDGetTokenT<reco::VertexCollection>          tok_Vertex_;
+  edm::EDGetTokenT<reco::GsfElectronCollection>     tok_GsfElec_;
+  edm::EDGetTokenT<double>                          tok_Rho_;
+  edm::EDGetTokenT<reco::ConversionCollection>      tok_Conv_;
+  edm::EDGetTokenT<reco::BeamSpot>                  tok_BS_;
+  edm::EDGetTokenT<std::vector<reco::Vertex> >      tok_PV_;
+  edm::EDGetTokenT<reco::PFMETCollection>           tok_PFMET_;
+  edm::EDGetTokenT<reco::PFMETCollection>           tok_PFType1MET_;
+  edm::EDGetTokenT<edm::TriggerResults>             tok_TrigRes_;
 
   //bool doPhotons_;                  // use Photons
   bool doCaloJets_;                 // use CaloJets

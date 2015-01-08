@@ -39,6 +39,7 @@
 #include "DataFormats/ParticleFlowReco/interface/PFRecHitFwd.h"
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
+#include "DataFormats/JetReco/interface/GenJetCollection.h"
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
@@ -132,6 +133,15 @@ class CalcRespCorrDiJets : public edm::EDAnalyzer {
   bool doCaloJets_;                 // use CaloJets
   bool doPFJets_;                   // use PFJets
   bool doGenJets_;                  // use GenJets
+
+  edm::EDGetTokenT<reco::CaloJetCollection>         tok_CaloJet_;
+  edm::EDGetTokenT<reco::PFJetCollection>           tok_PFJet_;
+  edm::EDGetTokenT<std::vector<reco::GenJet> >      tok_GenJet_;
+  edm::EDGetTokenT<std::vector<reco::GenParticle> > tok_GenPart_;
+  edm::EDGetTokenT<GenEventInfoProduct>             tok_GenEvInfo_; 
+  edm::EDGetTokenT<edm::SortedCollection<HBHERecHit,edm::StrictWeakOrdering<HBHERecHit> > > tok_HBHE_;
+  edm::EDGetTokenT<edm::SortedCollection<HFRecHit,edm::StrictWeakOrdering<HFRecHit> > >     tok_HF_;
+  edm::EDGetTokenT<edm::SortedCollection<HORecHit,edm::StrictWeakOrdering<HORecHit> > >     tok_HO_;
 
   // root file/histograms
   TFile* rootfile_;

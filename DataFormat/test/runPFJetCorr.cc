@@ -1,14 +1,12 @@
 #include "HcalClosureTest/DataFormat/interface/runPFJetCorr.h"
 
-using namespace std;
-
 int main()
 {
   TChain* tree = new TChain("pf_dijettree");
   TString input = "/eos/uscms/store/user/dgsheffi/QCD_Pt-15to3000_TuneD6T_Flat_8TeV_pythia6/DijetCalibration_dEta-1p5_Et-10_3rdEt-50/e02441adc4b1f61e7a01cc47fa7cba8d/tree_*.root";
-  cout << "Opening file: " << input << endl;
+  std::cout << "Opening file: " << input << std::endl;
   tree->Add(input);
-  cout << "File opened." << endl;
+  std::cout << "File opened." << std::endl;
 
   TString output = "/uscms_data/d3/dgsheffi/HCal/corrections/test.root";
 
@@ -23,37 +21,37 @@ int main()
   float tjet_photon_E_, tjet_photon_px_, tjet_photon_py_, tjet_photon_pz_, tjet_photon_EcalE_;
   int tjet_unkown_n_, tjet_electron_n_, tjet_muon_n_, tjet_photon_n_;
   int tjet_had_n_, tjet_cluster_n_;
-  vector<float>* tjet_had_E_ = 0;
-  vector<float>* tjet_had_px_ = 0;
-  vector<float>* tjet_had_py_ = 0;
-  vector<float>* tjet_had_pz_ = 0;
-  vector<float>* tjet_had_EcalE_ = 0;
-  vector<float>* tjet_had_rawHcalE_ = 0;
-  vector<float>* tjet_had_emf_ = 0;
-  vector<float>* tjet_had_E_mctruth_ = 0;
-  vector<int>* tjet_had_id_ = 0;
-  vector<int>* tjet_had_candtrackind_ = 0;
-  vector<int>* tjet_had_mcpdgId_ = 0;
-  vector<int>* tjet_had_ntwrs_ = 0;
+  std::vector<float>* tjet_had_E_ = 0;
+  std::vector<float>* tjet_had_px_ = 0;
+  std::vector<float>* tjet_had_py_ = 0;
+  std::vector<float>* tjet_had_pz_ = 0;
+  std::vector<float>* tjet_had_EcalE_ = 0;
+  std::vector<float>* tjet_had_rawHcalE_ = 0;
+  std::vector<float>* tjet_had_emf_ = 0;
+  std::vector<float>* tjet_had_E_mctruth_ = 0;
+  std::vector<int>* tjet_had_id_ = 0;
+  std::vector<int>* tjet_had_candtrackind_ = 0;
+  std::vector<int>* tjet_had_mcpdgId_ = 0;
+  std::vector<int>* tjet_had_ntwrs_ = 0;
   int tjet_ntwrs_;
-  vector<int>* tjet_twr_ieta_ = 0;
-  vector<int>* tjet_twr_iphi_ = 0;
-  vector<int>* tjet_twr_candtrackind_ = 0;
-  vector<int>* tjet_twr_hadind_ = 0;
-  vector<int>* tjet_twr_elmttype_ = 0;
-  vector<int>* tjet_twr_subdet_ = 0;
-  vector<float>* tjet_twr_hade_ = 0;
-  vector<float>* tjet_twr_frac_ = 0;
-  vector<float>* tjet_twr_dR_ = 0;
-  vector<int>* tjet_twr_clusterind_ = 0;
-  vector<float>* tjet_cluster_eta_ = 0;
-  vector<float>* tjet_cluster_phi_ = 0;
-  vector<float>* tjet_cluster_dR_ = 0;
+  std::vector<int>* tjet_twr_ieta_ = 0;
+  std::vector<int>* tjet_twr_iphi_ = 0;
+  std::vector<int>* tjet_twr_candtrackind_ = 0;
+  std::vector<int>* tjet_twr_hadind_ = 0;
+  std::vector<int>* tjet_twr_elmttype_ = 0;
+  std::vector<int>* tjet_twr_subdet_ = 0;
+  std::vector<float>* tjet_twr_hade_ = 0;
+  std::vector<float>* tjet_twr_frac_ = 0;
+  std::vector<float>* tjet_twr_dR_ = 0;
+  std::vector<int>* tjet_twr_clusterind_ = 0;
+  std::vector<float>* tjet_cluster_eta_ = 0;
+  std::vector<float>* tjet_cluster_phi_ = 0;
+  std::vector<float>* tjet_cluster_dR_ = 0;
   int tjet_ncandtracks_;
-  vector<float>* tjet_candtrack_px_ = 0;
-  vector<float>* tjet_candtrack_py_ = 0;
-  vector<float>* tjet_candtrack_pz_ = 0;
-  vector<float>* tjet_candtrack_EcalE_ = 0;
+  std::vector<float>* tjet_candtrack_px_ = 0;
+  std::vector<float>* tjet_candtrack_py_ = 0;
+  std::vector<float>* tjet_candtrack_pz_ = 0;
+  std::vector<float>* tjet_candtrack_EcalE_ = 0;
   float pjet_pt_, pjet_p_, pjet_E_, pjet_eta_, pjet_phi_, pjet_scale_;
   float pjet_gendr_, pjet_genpt_, pjet_genp_, pjet_genE_;
   //float pjet_EBE_, pjet_EEE_, pjet_HBE_, pjet_HEE_, pjet_HFE_;
@@ -63,37 +61,37 @@ int main()
   float pjet_photon_E_, pjet_photon_px_, pjet_photon_py_, pjet_photon_pz_, pjet_photon_EcalE_;
   int pjet_unkown_n_, pjet_electron_n_, pjet_muon_n_, pjet_photon_n_;
   int pjet_had_n_, pjet_cluster_n_;
-  vector<float>* pjet_had_E_ = 0;
-  vector<float>* pjet_had_px_ = 0;
-  vector<float>* pjet_had_py_ = 0;
-  vector<float>* pjet_had_pz_ = 0;
-  vector<float>* pjet_had_EcalE_ = 0;
-  vector<float>* pjet_had_rawHcalE_ = 0;
-  vector<float>* pjet_had_emf_ = 0;
-  vector<float>* pjet_had_E_mctruth_ = 0;
-  vector<int>* pjet_had_id_ = 0;
-  vector<int>* pjet_had_candtrackind_ = 0;
-  vector<int>* pjet_had_mcpdgId_ = 0;
-  vector<int>* pjet_had_ntwrs_ = 0;
+  std::vector<float>* pjet_had_E_ = 0;
+  std::vector<float>* pjet_had_px_ = 0;
+  std::vector<float>* pjet_had_py_ = 0;
+  std::vector<float>* pjet_had_pz_ = 0;
+  std::vector<float>* pjet_had_EcalE_ = 0;
+  std::vector<float>* pjet_had_rawHcalE_ = 0;
+  std::vector<float>* pjet_had_emf_ = 0;
+  std::vector<float>* pjet_had_E_mctruth_ = 0;
+  std::vector<int>* pjet_had_id_ = 0;
+  std::vector<int>* pjet_had_candtrackind_ = 0;
+  std::vector<int>* pjet_had_mcpdgId_ = 0;
+  std::vector<int>* pjet_had_ntwrs_ = 0;
   int pjet_ntwrs_;
-  vector<int>* pjet_twr_ieta_ = 0;
-  vector<int>* pjet_twr_iphi_ = 0;
-  vector<int>* pjet_twr_subdet_ = 0;
-  vector<float>* pjet_twr_candtrackind_ = 0;
-  vector<float>* pjet_twr_hadind_ = 0;
-  vector<float>* pjet_twr_elmttype_ = 0;
-  vector<float>* pjet_twr_hade_ = 0;
-  vector<float>* pjet_twr_frac_ = 0;
-  vector<float>* pjet_twr_dR_ = 0;
-  vector<int>* pjet_twr_clusterind_ = 0;
-  vector<float>* pjet_cluster_eta_ = 0;
-  vector<float>* pjet_cluster_phi_ = 0;
-  vector<float>* pjet_cluster_dR_ = 0;
+  std::vector<int>* pjet_twr_ieta_ = 0;
+  std::vector<int>* pjet_twr_iphi_ = 0;
+  std::vector<int>* pjet_twr_subdet_ = 0;
+  std::vector<float>* pjet_twr_candtrackind_ = 0;
+  std::vector<float>* pjet_twr_hadind_ = 0;
+  std::vector<float>* pjet_twr_elmttype_ = 0;
+  std::vector<float>* pjet_twr_hade_ = 0;
+  std::vector<float>* pjet_twr_frac_ = 0;
+  std::vector<float>* pjet_twr_dR_ = 0;
+  std::vector<int>* pjet_twr_clusterind_ = 0;
+  std::vector<float>* pjet_cluster_eta_ = 0;
+  std::vector<float>* pjet_cluster_phi_ = 0;
+  std::vector<float>* pjet_cluster_dR_ = 0;
   int pjet_ncandtracks_;
-  vector<float>* pjet_candtrack_px_ = 0;
-  vector<float>* pjet_candtrack_py_ = 0;
-  vector<float>* pjet_candtrack_pz_ = 0;
-  vector<float>* pjet_candtrack_EcalE_ = 0;
+  std::vector<float>* pjet_candtrack_px_ = 0;
+  std::vector<float>* pjet_candtrack_py_ = 0;
+  std::vector<float>* pjet_candtrack_pz_ = 0;
+  std::vector<float>* pjet_candtrack_EcalE_ = 0;
   float dijet_deta_, dijet_dphi_, dijet_balance_;
   float thirdjet_px_, thirdjet_py_;
   int pf_Run_, pf_Lumi_, pf_Event_;
@@ -248,11 +246,11 @@ int main()
   int fails = 0;
 
   int nEvents = tree->GetEntries();
-  cout << "Running over " << nEvents << " events" << endl;
+  std::cout << "Running over " << nEvents << " events" << std::endl;
   //nEvents = 5;
   for(int iEvent=0; iEvent<nEvents; iEvent++){
     if(iEvent % 10000 == 0){
-      cout << "Processing event " << iEvent << endl;
+      std::cout << "Processing event " << iEvent << std::endl;
     }
     tree->GetEntry(iEvent);
     
@@ -261,7 +259,7 @@ int main()
     if(tjet_ntwrs_ == 0 || pjet_ntwrs_ == 0){
       fails++;
       passSel |= 0x80;
-      //cout << "Fails: " << iEvent << " " << tjet_ntwrs_ << " " << pjet_ntwrs_ << endl;
+      //std::cout << "Fails: " << iEvent << " " << tjet_ntwrs_ << " " << pjet_ntwrs_ << std::endl;
       //continue;
     }
     float tjet_Et = tjet_E_/cosh(tjet_eta_);
@@ -322,7 +320,7 @@ int main()
     datum.SetProbeEta(pjet_eta_);
     datum.SetProbePhi(pjet_phi_);
     for(int i=0; i<pjet_ntwrs_; i++){
-      //cout << pjet_twr_clusterind_->size() << " " << pjet_twr_clusterind_->at(i) << " " << pjet_cluster_n_ << endl;
+      //std::cout << pjet_twr_clusterind_->size() << " " << pjet_twr_clusterind_->at(i) << " " << pjet_cluster_n_ << std::endl;
       if(pjet_twr_hade_->at(i) > 0.0 && (pjet_twr_clusterind_->at(i) < 0 || pjet_cluster_dR_->at(pjet_twr_clusterind_->at(i)) < 0.5)){
 	datum.AddProbeHcalE(pjet_twr_hade_->at(i)*pjet_twr_frac_->at(i),pjet_twr_ieta_->at(i));
 	sump += pjet_twr_hade_->at(i)*pjet_twr_frac_->at(i);
@@ -366,12 +364,12 @@ int main()
     data.push_back(datum);
   }
 
-  cout << data.GetSize() << " data" << endl;
+  std::cout << data.GetSize() << " data" << std::endl;
   
-  cout << "Passes: " << nEvents - fails << " Fails: " << fails << endl;
-  cout << "Do CandTrack? " << data.GetDoCandTrackEnergyDiff() << endl;
+  std::cout << "Passes: " << nEvents - fails << " Fails: " << fails << std::endl;
+  std::cout << "Do CandTrack? " << data.GetDoCandTrackEnergyDiff() << std::endl;
   data.SetDoCandTrackEnergyDiff(false);
-  cout << "Do CandTrack? " << data.GetDoCandTrackEnergyDiff() << endl;
+  std::cout << "Do CandTrack? " << data.GetDoCandTrackEnergyDiff() << std::endl;
 
   //return 0;
   
@@ -385,8 +383,8 @@ int main()
   h_PassSel_->Write();
   fout->Close();
 
-  cout << "Passes: " << nEvents - fails << " Fails: " << fails << endl;
-  cout << "Events that passed cuts: " << h_PassSel_->GetBinContent(1) << endl;
+  std::cout << "Passes: " << nEvents - fails << " Fails: " << fails << std::endl;
+  std::cout << "Events that passed cuts: " << h_PassSel_->GetBinContent(1) << std::endl;
   
   return 0;
 }

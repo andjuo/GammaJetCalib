@@ -1,14 +1,12 @@
 #include "HcalClosureTest/Analyzers/interface/testRespCorrDiJetsTree.h"
 
-using namespace std;
-
 int main()
 {
   TChain* tree = new TChain("pf_dijettree");
   TString input = "/eos/uscms/store/user/dgsheffi/QCD_Pt-15to3000_TuneD6T_Flat_8TeV_pythia6/DijetCalibration_dEta-1p5_Et-10_3rdEt-50/e02441adc4b1f61e7a01cc47fa7cba8d/tree_*.root";
   //TString input = "/uscms_data/d3/dgsheffi/HCal/Trees/QCD_Pt-15to3000_0030487D5E5F_cluster.root";
   //TString input = "/uscms_data/d3/dgsheffi/HCal/Trees/Pion_Pt-50.root";
-  cout << "Opening file:" << input << endl;
+  std::cout << "Opening file:" << input << std::endl;
   tree->Add(input);
 
   TString output = "/uscms_data/d3/dgsheffi/HCal/Trees/validation/QCD_Pt-15to3000_TuneD6T_Flat_8TeV_pythia6.root";
@@ -30,37 +28,37 @@ int main()
   float tpfjet_photon_E_, tpfjet_photon_px_, tpfjet_photon_py_, tpfjet_photon_pz_, tpfjet_photon_EcalE_;
   int tpfjet_unkown_n_, tpfjet_electron_n_, tpfjet_muon_n_, tpfjet_photon_n_;
   int tpfjet_had_n_, tpfjet_cluster_n_;
-  vector<float>* tpfjet_had_E_ = 0;
-  vector<float>* tpfjet_had_px_ = 0;
-  vector<float>* tpfjet_had_py_ = 0;
-  vector<float>* tpfjet_had_pz_ = 0;
-  vector<float>* tpfjet_had_EcalE_ = 0;
-  vector<float>* tpfjet_had_rawHcalE_ = 0;
-  vector<float>* tpfjet_had_emf_ = 0;
-  vector<float>* tpfjet_had_E_mctruth_ = 0;
-  vector<int>* tpfjet_had_id_ = 0;
-  vector<int>* tpfjet_had_candtrackind_ = 0;
-  vector<int>* tpfjet_had_mcpdgId_ = 0;
-  vector<int>* tpfjet_had_ntwrs_ = 0;
+  std::vector<float>* tpfjet_had_E_ = 0;
+  std::vector<float>* tpfjet_had_px_ = 0;
+  std::vector<float>* tpfjet_had_py_ = 0;
+  std::vector<float>* tpfjet_had_pz_ = 0;
+  std::vector<float>* tpfjet_had_EcalE_ = 0;
+  std::vector<float>* tpfjet_had_rawHcalE_ = 0;
+  std::vector<float>* tpfjet_had_emf_ = 0;
+  std::vector<float>* tpfjet_had_E_mctruth_ = 0;
+  std::vector<int>* tpfjet_had_id_ = 0;
+  std::vector<int>* tpfjet_had_candtrackind_ = 0;
+  std::vector<int>* tpfjet_had_mcpdgId_ = 0;
+  std::vector<int>* tpfjet_had_ntwrs_ = 0;
   int tpfjet_ntwrs_;
-  vector<int>* tpfjet_twr_ieta_ = 0;
-  vector<int>* tpfjet_twr_iphi_ = 0;
-  vector<int>* tpfjet_twr_candtrackind_ = 0;
-  vector<int>* tpfjet_twr_hadind_ = 0;
-  vector<int>* tpfjet_twr_elmttype_ = 0;
-  vector<int>* tpfjet_twr_subdet_ = 0;
-  vector<float>* tpfjet_twr_hade_ = 0;
-  vector<float>* tpfjet_twr_frac_ = 0;
-  vector<float>* tpfjet_twr_dR_ = 0;
-  vector<int>* tpfjet_twr_clusterind_ = 0;
-  vector<float>* tpfjet_cluster_eta_ = 0;
-  vector<float>* tpfjet_cluster_phi_ = 0;
-  vector<float>* tpfjet_cluster_dR_ = 0;
+  std::vector<int>* tpfjet_twr_ieta_ = 0;
+  std::vector<int>* tpfjet_twr_iphi_ = 0;
+  std::vector<int>* tpfjet_twr_candtrackind_ = 0;
+  std::vector<int>* tpfjet_twr_hadind_ = 0;
+  std::vector<int>* tpfjet_twr_elmttype_ = 0;
+  std::vector<int>* tpfjet_twr_subdet_ = 0;
+  std::vector<float>* tpfjet_twr_hade_ = 0;
+  std::vector<float>* tpfjet_twr_frac_ = 0;
+  std::vector<float>* tpfjet_twr_dR_ = 0;
+  std::vector<int>* tpfjet_twr_clusterind_ = 0;
+  std::vector<float>* tpfjet_cluster_eta_ = 0;
+  std::vector<float>* tpfjet_cluster_phi_ = 0;
+  std::vector<float>* tpfjet_cluster_dR_ = 0;
   int tpfjet_ncandtracks_;
-  vector<float>* tpfjet_candtrack_px_ = 0;
-  vector<float>* tpfjet_candtrack_py_ = 0;
-  vector<float>* tpfjet_candtrack_pz_ = 0;
-  vector<float>* tpfjet_candtrack_EcalE_ = 0;
+  std::vector<float>* tpfjet_candtrack_px_ = 0;
+  std::vector<float>* tpfjet_candtrack_py_ = 0;
+  std::vector<float>* tpfjet_candtrack_pz_ = 0;
+  std::vector<float>* tpfjet_candtrack_EcalE_ = 0;
   float ppfjet_pt_, ppfjet_p_, ppfjet_E_, ppfjet_eta_, ppfjet_phi_, ppfjet_scale_;
   float ppfjet_gendr_, ppfjet_genpt_, ppfjet_genp_, ppfjet_genE_;
   //float ppfjet_EBE_, ppfjet_EEE_, ppfjet_HBE_, ppfjet_HEE_, ppfjet_HFE_;
@@ -70,37 +68,37 @@ int main()
   float ppfjet_photon_E_, ppfjet_photon_px_, ppfjet_photon_py_, ppfjet_photon_pz_, ppfjet_photon_EcalE_;
   int ppfjet_unkown_n_, ppfjet_electron_n_, ppfjet_muon_n_, ppfjet_photon_n_;
   int ppfjet_had_n_, ppfjet_cluster_n_;
-  vector<float>* ppfjet_had_E_ = 0;
-  vector<float>* ppfjet_had_px_ = 0;
-  vector<float>* ppfjet_had_py_ = 0;
-  vector<float>* ppfjet_had_pz_ = 0;
-  vector<float>* ppfjet_had_EcalE_ = 0;
-  vector<float>* ppfjet_had_rawHcalE_ = 0;
-  vector<float>* ppfjet_had_emf_ = 0;
-  vector<float>* ppfjet_had_E_mctruth_ = 0;
-  vector<int>* ppfjet_had_id_ = 0;
-  vector<int>* ppfjet_had_candtrackind_ = 0;
-  vector<int>* ppfjet_had_mcpdgId_ = 0;
-  vector<int>* ppfjet_had_ntwrs_ = 0;
+  std::vector<float>* ppfjet_had_E_ = 0;
+  std::vector<float>* ppfjet_had_px_ = 0;
+  std::vector<float>* ppfjet_had_py_ = 0;
+  std::vector<float>* ppfjet_had_pz_ = 0;
+  std::vector<float>* ppfjet_had_EcalE_ = 0;
+  std::vector<float>* ppfjet_had_rawHcalE_ = 0;
+  std::vector<float>* ppfjet_had_emf_ = 0;
+  std::vector<float>* ppfjet_had_E_mctruth_ = 0;
+  std::vector<int>* ppfjet_had_id_ = 0;
+  std::vector<int>* ppfjet_had_candtrackind_ = 0;
+  std::vector<int>* ppfjet_had_mcpdgId_ = 0;
+  std::vector<int>* ppfjet_had_ntwrs_ = 0;
   int ppfjet_ntwrs_;
-  vector<int>* ppfjet_twr_ieta_ = 0;
-  vector<int>* ppfjet_twr_iphi_ = 0;
-  vector<int>* ppfjet_twr_subdet_ = 0;
-  vector<float>* ppfjet_twr_candtrackind_ = 0;
-  vector<float>* ppfjet_twr_hadind_ = 0;
-  vector<float>* ppfjet_twr_elmttype_ = 0;
-  vector<float>* ppfjet_twr_hade_ = 0;
-  vector<float>* ppfjet_twr_frac_ = 0;
-  vector<float>* ppfjet_twr_dR_ = 0;
-  vector<int>* ppfjet_twr_clusterind_ = 0;
-  vector<float>* ppfjet_cluster_eta_ = 0;
-  vector<float>* ppfjet_cluster_phi_ = 0;
-  vector<float>* ppfjet_cluster_dR_ = 0;
+  std::vector<int>* ppfjet_twr_ieta_ = 0;
+  std::vector<int>* ppfjet_twr_iphi_ = 0;
+  std::vector<int>* ppfjet_twr_subdet_ = 0;
+  std::vector<float>* ppfjet_twr_candtrackind_ = 0;
+  std::vector<float>* ppfjet_twr_hadind_ = 0;
+  std::vector<float>* ppfjet_twr_elmttype_ = 0;
+  std::vector<float>* ppfjet_twr_hade_ = 0;
+  std::vector<float>* ppfjet_twr_frac_ = 0;
+  std::vector<float>* ppfjet_twr_dR_ = 0;
+  std::vector<int>* ppfjet_twr_clusterind_ = 0;
+  std::vector<float>* ppfjet_cluster_eta_ = 0;
+  std::vector<float>* ppfjet_cluster_phi_ = 0;
+  std::vector<float>* ppfjet_cluster_dR_ = 0;
   int ppfjet_ncandtracks_;
-  vector<float>* ppfjet_candtrack_px_ = 0;
-  vector<float>* ppfjet_candtrack_py_ = 0;
-  vector<float>* ppfjet_candtrack_pz_ = 0;
-  vector<float>* ppfjet_candtrack_EcalE_ = 0;
+  std::vector<float>* ppfjet_candtrack_px_ = 0;
+  std::vector<float>* ppfjet_candtrack_py_ = 0;
+  std::vector<float>* ppfjet_candtrack_pz_ = 0;
+  std::vector<float>* ppfjet_candtrack_EcalE_ = 0;
   float pf_dijet_deta_, pf_dijet_dphi_, pf_dijet_balance_;
   float pf_thirdjet_px_, pf_thirdjet_py_;
   int pf_Run_, pf_Lumi_, pf_Event_;
@@ -316,11 +314,11 @@ int main()
   int nEventsNoProbeRecHits = 0;
 
   int nEvents = tree->GetEntries();
-  cout << "Running over " << nEvents << " events" << endl;
+  std::cout << "Running over " << nEvents << " events" << std::endl;
   //nEvents = 5;
   for(int iEvent=0; iEvent<nEvents; iEvent++){
     if(iEvent % 10000 == 0){
-      cout << "Processing event " << iEvent << endl;
+      std::cout << "Processing event " << iEvent << std::endl;
     }
     tree->GetEntry(iEvent);
     
@@ -345,8 +343,8 @@ int main()
     if(tpfjet_ntwrs_ == 0 && ppfjet_ntwrs_ == 0) nEventsNoRecHits++;
 
     if(iEvent == debugEvent){
-      cout << "tag " << tpfjet_eta_ << " " << tpfjet_phi_ << endl;
-      cout << "probe " << ppfjet_eta_ << " " << ppfjet_phi_ << endl;
+      std::cout << "tag " << tpfjet_eta_ << " " << tpfjet_phi_ << std::endl;
+      std::cout << "probe " << ppfjet_eta_ << " " << ppfjet_phi_ << std::endl;
       for(int j=0; j<tpfjet_ntwrs_; j++){
 	//if(tpfjet_twr_frac_->at(j) < 0.95) continue;
 	h_tag_jet_rechitpos_->Fill(tpfjet_twr_ieta_->at(j),tpfjet_twr_iphi_->at(j),tpfjet_twr_hade_->at(j));
@@ -367,7 +365,7 @@ int main()
       }
       for(int i=0; i<ppfjet_had_n_; i++){
 	TLorentzVector pv(ppfjet_had_px_->at(i),ppfjet_had_py_->at(i),ppfjet_had_pz_->at(i),ppfjet_had_E_->at(i));
-	//cout << pv.Eta() << endl;
+	//std::cout << pv.Eta() << std::endl;
 	float tmpphi = pv.Phi();
 	if(tmpphi < 0) tmpphi += 2*3.141592653;
 	h_probe_jet_candpos_->Fill(pv.Eta()/0.087,tmpphi/0.087,ppfjet_had_E_->at(i));
@@ -609,7 +607,7 @@ int main()
 
   for(int k=0; k<25; k++){
     TH1D* tmpthist = (TH1D*)h_tag_jet_Ediff_once_track_cluster_2d_->ProfileX(" ",k+1,k+1);
-    //cout << k << ": " << tmpthist->GetMean() << " " << tmpthist->GetRMS() << endl;
+    //std::cout << k << ": " << tmpthist->GetMean() << " " << tmpthist->GetRMS() << std::endl;
     h_tag_jet_Ediff_once_track_cluster_range_->SetBinContent(k+1,tmpthist->GetMean());
     h_tag_jet_Ediff_once_track_cluster_range_->SetBinError(k+1,tmpthist->GetRMS());
 
@@ -687,11 +685,11 @@ int main()
   //h_probe_jet_Ediff_once_track_cluster_2d_->Write();
   
   fout->Close();
-  cout << "Created file:" << output << endl;
+  std::cout << "Created file:" << output << std::endl;
 
-  cout << "Events without tag rechits: " << nEventsNoTagRecHits << "/" << nEvents << " = " << (double)nEventsNoTagRecHits/(double)nEvents << endl;
-  cout << "Events without probe rechits: " << nEventsNoProbeRecHits << "/" << nEvents << " = " << (double)nEventsNoProbeRecHits/(double)nEvents << endl;
-  cout << "Events without any rechits: " << nEventsNoRecHits << "/" << nEvents << " = " << (double)nEventsNoRecHits/(double)nEvents << endl;
+  std::cout << "Events without tag rechits: " << nEventsNoTagRecHits << "/" << nEvents << " = " << (double)nEventsNoTagRecHits/(double)nEvents << std::endl;
+  std::cout << "Events without probe rechits: " << nEventsNoProbeRecHits << "/" << nEvents << " = " << (double)nEventsNoProbeRecHits/(double)nEvents << std::endl;
+  std::cout << "Events without any rechits: " << nEventsNoRecHits << "/" << nEvents << " = " << (double)nEventsNoRecHits/(double)nEvents << std::endl;
 
   return 0;
 }

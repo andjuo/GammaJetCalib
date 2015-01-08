@@ -6,8 +6,6 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
-#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
-
 #include "HcalClosureTest/DataFormat/interface/SingleParticleCluster.h"
 #include "HcalClosureTest/Producers/interface/SingleParticleClusterProducer.h"
 
@@ -25,6 +23,8 @@
 
 SingleParticleClusterProducer::SingleParticleClusterProducer(const edm::ParameterSet& iConfig)
 {
+  tok_GenPart_   = consumes<std::vector<reco::GenParticle> >(edm::InputTag("genParticles"));
+  tok_CaloTower_ = consumes<CaloTowerCollection>(edm::InputTag("towerMaker"));
   produces<SingleParticleClusterCollection>();
 }
 
@@ -47,7 +47,7 @@ SingleParticleClusterProducer::produce(edm::Event& iEvent, const edm::EventSetup
 
   // get the genparticles
   edm::Handle<reco::GenParticleCollection > genpcoll;
-  iEvent.getByLabel("genParticles", genpcoll);
+  iEvent.getByToken(tok_GenPart_, genpcoll);
   if(!(genpcoll.isValid())) {
     //    LogError("SingleParticleClusterProducer") << "genParticles not found";
     return;
@@ -55,7 +55,7 @@ SingleParticleClusterProducer::produce(edm::Event& iEvent, const edm::EventSetup
 
   // get the calotower collection
   edm::Handle<CaloTowerCollection> twrcoll;
-  iEvent.getByLabel("towerMaker", twrcoll);
+  iEvent.getByToken(tok_CaloTower_, twrcoll);
   if(!(twrcoll.isValid())) { // use message logger
     //    LogError("CaloCalibAnalyzer") << "towerMaker not found";
     return;
