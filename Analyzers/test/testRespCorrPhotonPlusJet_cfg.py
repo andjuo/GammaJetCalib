@@ -16,7 +16,8 @@ process.load("MagneticField.Engine.autoMagneticFieldProducer_cfi")
 process.load('HcalClosureTest.Analyzers.calcrespcorrphotonplusjet_cfi')
 #  needed for nonCHS
 process.load('JetMETCorrections.Configuration.JetCorrectionProducers_cff')
-#process.load('JetMETCorrections.Configuration.JetCorrectionServices_cff')
+# needed for the correctors
+process.load('JetMETCorrections.Configuration.JetCorrectionServicesAllAlgos_cff')
 
 # run over files
 process.calcrespcorrphotonplusjet.rootHistFilename = cms.string('PhoJet_tree_CHS.root')
@@ -84,15 +85,9 @@ process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
 # Load pfNoPileUP
 process.load("CommonTools.ParticleFlow.pfNoPileUp_cff")
 process.load("CommonTools.ParticleFlow.PF2PAT_cff")
-from RecoJets.JetProducers.ak5PFJets_cfi import *
-process.ak5PFJetsCHS = ak5PFJets.clone(
- src = cms.InputTag("pfNoPileUp")
-)
-
-process.load('HcalClosureTest.Analyzers.calcrespcorr_CHSJECs_cff')
 
 process.p = cms.Path(
-#process.pfNoPileUpSequence*  # already included in PF2PAT
+process.ak4PFJets+  # needed for pfJetTracksAssociatorAtVertex
 process.PF2PAT
 +(process.ak5PFJetsCHS
 +process.calcrespcorrphotonplusjet)
